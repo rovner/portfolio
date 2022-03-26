@@ -4,6 +4,7 @@ plugins {
     id "io.freefair.lombok" version "6.4.1"
     id 'jacoco'
     id "com.palantir.docker" version "0.26.0"
+    id "com.github.spotbugs" version "5.0.6"
 }
 
 group 'io.rovner'
@@ -53,9 +54,22 @@ jacocoTestCoverageVerification {
 
 build.finalizedBy jacocoTestCoverageVerification
 
+spotbugsMain {
+    //noinspection GroovyAssignabilityCheck
+    reports {
+        html {
+            //noinspection GroovyAssignabilityCheck
+            required = true
+            //noinspection GroovyAssignabilityCheck
+            outputLocation = file("$buildDir/reports/spotbugs/main/spotbugs.html")
+            stylesheet = 'fancy-hist.xsl'
+        }
+    }
+}
+
 docker {
     dependsOn bootJar
-    name "backend-example"
+    name "backend-app"
     files bootJar.outputs
     buildArgs([
             JAR_FILE: "${project.name}-${version}.jar"
