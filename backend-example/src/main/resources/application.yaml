@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    hikari:
+      connectionTimeout: 20000
+      maximumPoolSize: 5
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: password
+  
+  jpa:
+    hibernate:
+      #drop n create table again, good for testing, comment this in production
+      ddl-auto: create

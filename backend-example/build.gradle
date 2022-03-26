@@ -1,0 +1,63 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.6.5'
+    id "io.freefair.lombok" version "6.4.1"
+    id 'jacoco'
+    id "com.palantir.docker" version "0.26.0"
+}
+
+group 'io.rovner'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+dependencies {
+    implementation('org.springframework.boot:spring-boot-starter-web')
+    implementation('org.springframework.boot:spring-boot-starter-data-jpa')
+    implementation('org.postgresql:postgresql:42.3.3')
+
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                counter = 'INSTRUCTION'
+                minimum = 0.9
+            }
+            limit {
+                counter = 'BRANCH'
+                minimum = 0.9
+            }
+        }
+    }
+}
+
+build.finalizedBy jacocoTestCoverageVerification
+
+docker {
+    dependsOn bootJar
+    name "backend-example"
+    files bootJar.outputs
+    buildArgs([
+            JAR_FILE: "${project.name}-${version}.jar"
+    ])
+}
