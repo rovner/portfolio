@@ -10,9 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -44,7 +42,7 @@ public class TodoControllerTest {
 
     @Test
     @DisplayName("List empty todo list")
-    public void shouldListEmptyTodos() throws Exception {
+    void shouldListEmptyTodos() throws Exception {
         when(repository.findAll()).thenReturn(emptyList());
         mockMvc.perform(get("/api/v1/todos"))
                 .andDo(print())
@@ -55,7 +53,7 @@ public class TodoControllerTest {
 
     @Test
     @DisplayName("List todo list with 2 items")
-    public void shouldListTodos() throws Exception {
+    void shouldListTodos() throws Exception {
         List<TodoItem> items = asList(
                 TodoItem.builder()
                         .id(1L)
@@ -78,7 +76,7 @@ public class TodoControllerTest {
 
     @Test
     @DisplayName("Get todo item by id - item exist")
-    public void shouldReturnItemById() throws Exception {
+    void shouldReturnItemById() throws Exception {
         TodoItem item = TodoItem.builder()
                 .id(1L)
                 .deadline(System.currentTimeMillis())
@@ -94,7 +92,7 @@ public class TodoControllerTest {
 
     @Test
     @DisplayName("Get todo item by id - item does not exit")
-    public void shouldReturn404WhenNotFound() throws Exception {
+    void shouldReturn404WhenNotFound() throws Exception {
         when(repository.findById(1L)).thenReturn(Optional.empty());
         mockMvc.perform(get("/api/v1/todos/todo/1"))
                 .andDo(print())
@@ -103,7 +101,7 @@ public class TodoControllerTest {
 
     @Test
     @DisplayName("Create todo item")
-    public void shouldCreateItem() throws Exception {
+    void shouldCreateItem() throws Exception {
         TodoItem item = TodoItem.builder()
                 .deadline(System.currentTimeMillis())
                 .task("test")
@@ -123,7 +121,7 @@ public class TodoControllerTest {
 
     @ParameterizedTest(name = "Update todo item ${0}")
     @MethodSource("updateArguments")
-    public void shouldUpdateItem(TodoItem item) throws Exception {
+    void shouldUpdateItem(TodoItem item) throws Exception {
         TodoItem itemWithId = item.toBuilder()
                 .id(1L)
                 .build();
@@ -144,7 +142,7 @@ public class TodoControllerTest {
 
     @Test
     @DisplayName("Update todo item - item does not exit")
-    public void shouldReturn404WhenItemDoesNotExist() throws Exception {
+    void shouldReturn404WhenItemDoesNotExist() throws Exception {
         when(repository.findById(1L)).thenReturn(Optional.empty());
         mockMvc.perform(put("/api/v1/todos/todo/1")
                         .contentType(APPLICATION_JSON)
@@ -156,7 +154,7 @@ public class TodoControllerTest {
 
     @Test
     @DisplayName("Delete todo item")
-    public void shouldDeleteItem() throws Exception {
+    void shouldDeleteItem() throws Exception {
         TodoItem item = TodoItem.builder()
                 .deadline(System.currentTimeMillis())
                 .task("test")

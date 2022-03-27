@@ -1,20 +1,32 @@
 plugins {
     id 'java'
     id 'org.springframework.boot' version '2.6.5'
-    id "io.freefair.lombok" version "6.4.1"
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'io.freefair.lombok' version '6.4.1'
     id 'jacoco'
-    id "com.palantir.docker" version "0.26.0"
-    id "com.github.spotbugs" version "5.0.6"
+    id 'com.palantir.docker' version '0.26.0'
+    id 'com.github.spotbugs' version '5.0.6'
+    id 'io.qameta.allure' version '2.9.6'
 }
 
 group 'io.rovner'
 version '1.0-SNAPSHOT'
 
+ext {
+    junitVersion = '5.8.2'
+    allureVersion = '2.17.3'
+    testContainersVersion = '1.16.3'
+    retrofitVersion = '2.9.0'
+}
+
 repositories {
     mavenCentral()
 }
 
-apply plugin: 'io.spring.dependency-management'
+configurations {
+    integrationTestImplementation.extendsFrom implementation
+    integrationTestRuntimeOnly.extendsFrom runtimeOnly
+}
 
 dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web')
@@ -24,8 +36,20 @@ dependencies {
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+
+    integrationTestImplementation "io.qameta.allure:allure-junit5:${allureVersion}"
+    integrationTestImplementation "io.qameta.allure:allure-okhttp:${allureVersion}"
+    integrationTestImplementation "io.qameta.allure:allure-assertj:${allureVersion}"
+    integrationTestImplementation "com.squareup.retrofit2:retrofit:${retrofitVersion}"
+    integrationTestImplementation "com.squareup.retrofit2:converter-gson:${retrofitVersion}"
+    integrationTestImplementation 'org.assertj:assertj-core:3.22.0'
+    integrationTestImplementation "org.testcontainers:testcontainers:${testContainersVersion}"
+    integrationTestImplementation "org.testcontainers:junit-jupiter:${testContainersVersion}"
+    integrationTestImplementation "org.testcontainers:postgresql:${testContainersVersion}"
+    integrationTestImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+    integrationTestRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
 }
 
 test {
@@ -74,4 +98,35 @@ docker {
     buildArgs([
             JAR_FILE: "${project.name}-${version}.jar"
     ])
+}
+
+sourceSets {
+    integrationTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+tasks.register('integrationTest', Test) {
+    description = 'Runs integration tests.'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    //noinspection GrUnresolvedAccess
+    shouldRunAfter test
+    //noinspection GrUnresolvedAccess
+    useJUnitPlatform()
+    //noinspection GrUnresolvedAccess
+    dependsOn tasks.docker
+    //noinspection GrUnresolvedAccess
+    finalizedBy allureReport
+}
+
+allure {
+    version = allureVersion
+}
+
+tasks.allureReport.doFirst {
+    file("${buildDir}/reports/allure-report").deleteDir()
 }
