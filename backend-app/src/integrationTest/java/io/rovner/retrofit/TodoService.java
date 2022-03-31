@@ -12,14 +12,14 @@ public interface TodoService {
     Call<List<TodoItem>> getAllTodos();
 
     @GET("api/v1/todos/todo/{id}")
-    Call<TodoItem> getItem(Long id);
+    Call<TodoItem> getItem(@Path("id") Long id);
 
     @POST("api/v1/todos/todo")
-    Call<TodoItem> addItem();
+    Call<TodoItem> addItem(@Body TodoItem item);
 
     @PUT("api/v1/todos/todo/{id}")
-    Call<TodoItem> updateItem(Long id, @Body TodoItem item);
+    Call<TodoItem> updateItem(@Path("id") Long id, @Body TodoItem item);
 
     @DELETE("api/v1/todos/todo/{id}")
-    Call<TodoItem> deleteItem(Long id);
+    Call<TodoItem> deleteItem(@Path("id") Long id);
 }

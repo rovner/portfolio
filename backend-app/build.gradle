@@ -51,6 +51,8 @@ dependencies {
     integrationTestImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
     integrationTestImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
     integrationTestImplementation 'commons-io:commons-io:2.11.0'
+    integrationTestImplementation 'org.postgresql:postgresql:42.3.3'
+    integrationTestImplementation 'org.springframework.data:spring-data-jpa:2.6.3'
     integrationTestRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
 }
 

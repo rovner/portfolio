@@ -1,31 +1,31 @@
 package io.rovner.tests;
 
-import io.qameta.allure.*;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import io.rovner.dao.TodoItemDao;
 import io.rovner.enteties.TodoItem;
 import io.rovner.helpers.Environment;
 import io.rovner.retrofit.TodoService;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.ext.ScriptUtils;
-import org.testcontainers.jdbc.JdbcDatabaseDelegate;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.shaded.org.apache.commons.lang.StringUtils;
 import retrofit2.Response;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 
 import static io.rovner.helpers.Allure.step;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
@@ -35,8 +35,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Feature("Todo api")
 public class TodoControllerTest {
 
-    private final Environment env = new Environment();
     private TodoService service;
+    private TodoItemDao dao;
+
+    @RegisterExtension
+    private final Environment env = new Environment();
 
     @Container
     private final PostgreSQLContainer<?> postgresqlContainer = env.getDatabaseContainer();
@@ -47,6 +50,7 @@ public class TodoControllerTest {
     @BeforeEach
     void before() {
         service = env.getService(TodoService.class);
+        dao = env.getDao(TodoItemDao.class);
     }
 
     @Test
@@ -60,50 +64,74 @@ public class TodoControllerTest {
     @Test
     @DisplayName("List todos")
     void shouldListNonEmptyTodos() throws IOException {
-        env.executeSqlScript("todos_init.sql");
+        List<TodoItem> todos = asList(TodoItem.builder()
+                        .id(1L)
+                        .deadline(1648543266000L)
+                        .task("task 1")
+                        .build(),
+                TodoItem.builder()
+                        .id(2L)
+                        .deadline(1648543266001L)
+                        .task("task 2")
+                        .build(),
+                TodoItem.builder()
+                        .id(1234L)
+                        .deadline(1648543266002L)
+                        .task("task 1234")
+                        .build());
+        todos.forEach(item -> dao.addTodo(item));
         Response<List<TodoItem>> response = service.getAllTodos().execute();
-        step("Assert that rest api response is 200", () -> assertThat(response.isSuccessful()).isTrue());
-        step("Assert that todo list contains exact items", () -> assertThat(response.body())
-                .containsExactlyInAnyOrder(
-                        TodoItem.builder()
-                                .id(1L)
-                                .deadline(1648543266000L)
-                                .task("task 1")
-                                .build(),
-                        TodoItem.builder()
-                                .id(2L)
-                                .deadline(1648543266001L)
-                                .task("task 2")
-                                .build(),
-                        TodoItem.builder()
-                                .id(1234L)
-                                .deadline(1648543266002L)
-                                .task("task 1234")
-                                .build()));
+        step("Assert that rest api response is 200", () -> assertThat(response.code()).isEqualTo(200));
+        step("Assert that todo list contains exact items", () -> assertThat(response.body()).isEqualTo(todos));
     }
 
     @Test
     @DisplayName("Create todo")
-    void shouldCreateTodo() throws IOException {
+    void shouldCreateTodo() throws Exception {
+        TodoItem task = TodoItem.builder()
+                .deadline(System.currentTimeMillis())
+                .task("test")
+                .build();
+        Response<TodoItem> response = service.addItem(task).execute();
+        step("Assert that rest api response is 200", () -> assertThat(response.code()).isEqualTo(200));
 
+        step("Assert that created item exist in database", () ->
+                assertThat(dao.getAllTodos()).containsExactlyInAnyOrder(task.toBuilder().id(1L).build()));
     }
 
     @Test
     @DisplayName("Response 500 if todo item is not valid")
     void shouldReturn500IfTodoItemIsNotValid() throws IOException {
-
+        TodoItem task = TodoItem.builder()
+                .deadline(System.currentTimeMillis())
+                .task(StringUtils.repeat("a", 256))
+                .build();
+        Response<TodoItem> response = service.addItem(task).execute();
+        step("Assert that rest api response is 500", () -> assertThat(response.code()).isEqualTo(500));
+        step("Assert that created item does not exist in database", () -> assertThat(dao.getAllTodos()).isEmpty());
     }
 
     @Test
     @DisplayName("Get todo")
     void shouldGetTodo() throws IOException {
+        TodoItem task = TodoItem.builder()
+                .id(1L)
+                .deadline(System.currentTimeMillis())
+                .task("test")
+                .build();
+        dao.addTodo(task);
+        Response<TodoItem> response = service.getItem(1L).execute();
+        step("Assert that rest api response is 200", () -> assertThat(response.code()).isEqualTo(200));
 
+        step("Assert that item is correct", () ->
+                assertThat(dao.getAllTodos()).containsExactlyInAnyOrder(task));
     }
 
     @Test
     @DisplayName("Response 404 on todo get if item does not exist")
     void shouldReturn404OnGetTodoIfDoesNotExist() throws IOException {
-
+        Response<TodoItem> response = service.getItem(1L).execute();
+        step("Assert that rest api response is 404", () -> assertThat(response.code()).isEqualTo(404));
     }
 
     @ParameterizedTest(name = "Update todo item ${0}")
