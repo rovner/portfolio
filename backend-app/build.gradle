@@ -40,7 +40,7 @@ dependencies {
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
 
     integrationTestImplementation "io.qameta.allure:allure-junit5:${allureVersion}"
-    integrationTestImplementation "io.qameta.allure:allure-okhttp:${allureVersion}"
+    integrationTestImplementation "io.qameta.allure:allure-okhttp3:${allureVersion}"
     integrationTestImplementation "io.qameta.allure:allure-assertj:${allureVersion}"
     integrationTestImplementation "com.squareup.retrofit2:retrofit:${retrofitVersion}"
     integrationTestImplementation "com.squareup.retrofit2:converter-gson:${retrofitVersion}"
@@ -49,6 +49,8 @@ dependencies {
     integrationTestImplementation "org.testcontainers:junit-jupiter:${testContainersVersion}"
     integrationTestImplementation "org.testcontainers:postgresql:${testContainersVersion}"
     integrationTestImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+    integrationTestImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
+    integrationTestImplementation 'commons-io:commons-io:2.11.0'
     integrationTestRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
 }
 
@@ -117,6 +119,13 @@ tasks.register('integrationTest', Test) {
     shouldRunAfter test
     //noinspection GrUnresolvedAccess
     useJUnitPlatform()
+    systemProperties += [
+            "junit.jupiter.execution.parallel.enabled": "true",
+            "junit.jupiter.execution.parallel.mode.default": "concurrent",
+            "junit.jupiter.execution.parallel.mode.classes.default": "concurrent",
+            "junit.jupiter.execution.parallel.config.strategy": "fixed",
+            "junit.jupiter.execution.parallel.config.fixed.parallelism": "5"
+    ]
     //noinspection GrUnresolvedAccess
     dependsOn tasks.docker
     //noinspection GrUnresolvedAccess
