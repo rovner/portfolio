@@ -3,38 +3,34 @@ package io.rovner.helpers;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.qameta.allure.Attachment;
 import io.qameta.allure.Step;
-import io.rovner.enteties.TodoItem;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
-import org.testcontainers.ext.ScriptUtils;
 import org.testcontainers.jdbc.JdbcDatabaseDelegate;
 import org.testcontainers.shaded.org.apache.commons.io.IOUtils;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.sql.DataSource;
 import java.io.InputStream;
-import java.sql.*;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.Objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.Duration.ofMinutes;
 import static org.testcontainers.containers.BindMode.READ_ONLY;
+import static org.testcontainers.containers.BindMode.READ_WRITE;
 import static org.testcontainers.ext.ScriptUtils.runInitScript;
+import static org.testcontainers.shaded.org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.testcontainers.utility.DockerImageName.parse;
 
 @Slf4j
@@ -56,6 +52,9 @@ public class Environment implements BeforeEachCallback, AfterEachCallback {
             .withStartupAttempts(3)
             .dependsOn(databaseContainer)
             .withNetwork(network)
+            .withEnv("JAVA_OPTS", "-javaagent:/tmp/jacoco-jars/jacocoagent.jar=output=tcpserver,address=*")
+            .withFileSystemBind(buildSubDir("jacoco-jars/lib/"), "/tmp/jacoco-jars/", READ_ONLY)
+            .withFileSystemBind(buildSubDir("jacoco/"), "/tmp/jacoco-execs/", READ_WRITE)
             .withClasspathResourceMapping("application.it.yaml", "/etc/app/application.yaml", READ_ONLY)
             .withExposedPorts(8080)
             .waitingFor(new HttpWaitStrategy().forPort(8080).forPath("/api/v1/todos"))
@@ -78,6 +77,12 @@ public class Environment implements BeforeEachCallback, AfterEachCallback {
         if (connection != null) {
             connection.close();
         }
+        appContainer.execInContainer("java",
+                "-jar", "/tmp/jacoco-jars/jacococli.jar",
+                "dump",
+                "--address", "localhost",
+                "--port", "6300",
+                "--destfile", String.format("/tmp/jacoco-execs/integrationTest-%s.exec", randomAlphabetic(6)));
     }
 
     @SuppressFBWarnings("EI_EXPOSE_REP")
@@ -121,5 +126,9 @@ public class Environment implements BeforeEachCallback, AfterEachCallback {
     private static String attachScript(String scriptPath) {
         InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(scriptPath);
         return IOUtils.toString(Objects.requireNonNull(stream), UTF_8);
+    }
+
+    private static String buildSubDir(String subPath) {
+        return Paths.get("build").resolve(subPath).toAbsolutePath().toString();
     }
 }

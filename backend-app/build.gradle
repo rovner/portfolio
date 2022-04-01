@@ -26,6 +26,7 @@ repositories {
 configurations {
     integrationTestImplementation.extendsFrom implementation
     integrationTestRuntimeOnly.extendsFrom runtimeOnly
+    jacocoJars
 }
 
 dependencies {
@@ -54,6 +55,8 @@ dependencies {
     integrationTestImplementation 'org.postgresql:postgresql:42.3.3'
     integrationTestImplementation 'org.springframework.data:spring-data-jpa:2.6.3'
     integrationTestRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+
+    jacocoJars('org.jacoco:jacoco:0.8.7@zip')
 }
 
 test {
@@ -80,11 +83,29 @@ jacocoTestCoverageVerification {
     }
 }
 
+task jacocoJarsUnzip(type: Copy) {
+    from zipTree(configurations.jacocoJars.singleFile).matching {
+        include 'lib/jacocoagent.jar', 'lib/jacococli.jar'
+    }
+    into "$buildDir/jacoco-jars"
+}
+
+tasks.register('jacocoIntegrationTestReport', JacocoReport) {
+    //noinspection GroovyAssignabilityCheck
+    sourceSets sourceSets.main
+    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/integrationTest-*.exec")
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("${buildDir}/reports/jacoco/integrationTest/")
+    }
+}
+
 build.finalizedBy jacocoTestCoverageVerification
 
 spotbugsMain {
     //noinspection GroovyAssignabilityCheck
-     reports {
+    reports {
         html {
             //noinspection GroovyAssignabilityCheck
             required = true
@@ -150,16 +171,16 @@ tasks.register('integrationTest', Test) {
     //noinspection GrUnresolvedAccess
     useJUnitPlatform()
     systemProperties += [
-            "junit.jupiter.execution.parallel.enabled": "true",
-            "junit.jupiter.execution.parallel.mode.default": "concurrent",
-            "junit.jupiter.execution.parallel.mode.classes.default": "concurrent",
-            "junit.jupiter.execution.parallel.config.strategy": "fixed",
+            "junit.jupiter.execution.parallel.enabled"                 : "true",
+            "junit.jupiter.execution.parallel.mode.default"            : "concurrent",
+            "junit.jupiter.execution.parallel.mode.classes.default"    : "concurrent",
+            "junit.jupiter.execution.parallel.config.strategy"         : "fixed",
             "junit.jupiter.execution.parallel.config.fixed.parallelism": "3"
     ]
     //noinspection GrUnresolvedAccess
-    dependsOn tasks.docker
+    dependsOn tasks.docker, tasks.jacocoJarsUnzip
     //noinspection GrUnresolvedAccess
-    finalizedBy allureReport
+    finalizedBy tasks.allureReport, tasks.jacocoIntegrationTestReport
 }
 
 allure {
