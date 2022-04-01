@@ -159,10 +159,21 @@ public class TodoControllerTest {
                 .deadline(System.currentTimeMillis())
                 .task("test")
                 .build();
+        when(repository.findById(1L)).thenReturn(Optional.of(item));
         doNothing().when(repository).delete(item);
         mockMvc.perform(delete("/api/v1/todos/todo/1"))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Delete non existing todo item")
+    void shouldReturn404WhenDeletingNonExistingItem() throws Exception {
+        when(repository.findById(1L)).thenReturn(Optional.empty());
+        mockMvc.perform(delete("/api/v1/todos/todo/1"))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+        verify(repository, never()).delete(any());
     }
 
     static Stream<Arguments> updateArguments() {

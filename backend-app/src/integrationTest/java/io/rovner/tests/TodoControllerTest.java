@@ -122,7 +122,6 @@ public class TodoControllerTest {
         dao.addTodo(task);
         Response<TodoItem> response = service.getItem(1L).execute();
         step("Assert that rest api response is 200", () -> assertThat(response.code()).isEqualTo(200));
-
         step("Assert that item is correct", () ->
                 assertThat(dao.getAllTodos()).containsExactlyInAnyOrder(task));
     }
@@ -134,32 +133,67 @@ public class TodoControllerTest {
         step("Assert that rest api response is 404", () -> assertThat(response.code()).isEqualTo(404));
     }
 
-    @ParameterizedTest(name = "Update todo item ${0}")
+    @ParameterizedTest(name = "Update todo item {0}")
     @CsvSource({
             "with deadline and task, new task, 1648543266015",
-            "with deadline, null, 1648543266016",
-            "with task, new task, null",
-            "without deadline or task, null, null"
+            "with deadline,, 1648543266016",
+            "with task, new task,",
+            "without deadline or task,,"
     })
-    void updateTodoItem(String name, String task, Long deadline) throws IOException {
-
+    void updateTodoItem(@SuppressWarnings("unused") String name, String newTask, Long newDeadline) throws IOException {
+        Long oldDeadline = 1648543266010L;
+        String oldTask = "test";
+        TodoItem oldItem = TodoItem.builder()
+                .id(1L)
+                .deadline(oldDeadline)
+                .task(oldTask)
+                .build();
+        dao.addTodo(oldItem);
+        TodoItem newItem = TodoItem.builder()
+                .deadline(newDeadline)
+                .task(newTask)
+                .build();
+        Response<TodoItem> response = service.updateItem(1L, newItem).execute();
+        step("Assert that rest api response is 200", () -> assertThat(response.code()).isEqualTo(200));
+        step("Assert that todo is updated in database", () -> assertThat(dao.getTodo(1L))
+                .isPresent()
+                .get()
+                .isEqualTo(TodoItem.builder()
+                        .id(1L)
+                        .deadline(newDeadline == null ? oldDeadline : newDeadline)
+                        .task(newTask == null ? oldTask : newTask)
+                        .build()));
     }
 
     @Test
     @DisplayName("Response 404 on todo update if item does not exist")
     void shouldReturn404OnUpdateTodoIfDoesNotExist() throws IOException {
-
+        TodoItem newItem = TodoItem.builder()
+                .deadline(1648543266010L)
+                .task("test")
+                .build();
+        Response<TodoItem> response = service.updateItem(1L, newItem).execute();
+        step("Assert that rest api response is 404", () -> assertThat(response.code()).isEqualTo(404));
     }
 
     @Test
-    @DisplayName("Delete todo")
+    @DisplayName("Delete todo when item exist")
     void shouldDeleteTodo() throws IOException {
-
+        TodoItem task = TodoItem.builder()
+                .id(1L)
+                .deadline(System.currentTimeMillis())
+                .task("test")
+                .build();
+        dao.addTodo(task);
+        Response<Void> response = service.deleteItem(1L).execute();
+        step("Assert that rest api response is 200", () -> assertThat(response.code()).isEqualTo(200));
+        step("Assert that todo is updated in database", () -> assertThat(dao.getTodo(1L)).isNotPresent());
     }
 
     @Test
-    @DisplayName("Delete todo")
-    void shouldReturn200OnDeleteNonExistingItem() throws IOException {
-
+    @DisplayName("Delete todo when item does not exist")
+    void shouldReturn404nDeleteNonExistingItem() throws IOException {
+        Response<Void> response = service.deleteItem(1L).execute();
+        step("Assert that rest api response is 404", () -> assertThat(response.code()).isEqualTo(404));
     }
 }

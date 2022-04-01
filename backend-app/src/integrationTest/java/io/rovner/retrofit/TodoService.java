@@ -21,5 +21,5 @@ public interface TodoService {
     Call<TodoItem> updateItem(@Path("id") Long id, @Body TodoItem item);
 
     @DELETE("api/v1/todos/todo/{id}")
-    Call<TodoItem> deleteItem(@Path("id") Long id);
+    Call<Void> deleteItem(@Path("id") Long id);
 }

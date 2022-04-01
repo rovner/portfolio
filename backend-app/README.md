@@ -5,7 +5,7 @@
 Also this will:
  - execute unit tests
  - execute spotbugs checks, build report
- - collect unit tests code coverage, build report, check minimum coverage
+ - collect unit tests code coverage, build coverage report, check minimum coverage
 
 #####To build docker image execute
 `./gradlew :docker`

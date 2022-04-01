@@ -1,5 +1,6 @@
 package io.rovner.helpers;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.qameta.allure.Attachment;
 import io.qameta.allure.Step;
 import io.rovner.enteties.TodoItem;
@@ -79,10 +80,12 @@ public class Environment implements BeforeEachCallback, AfterEachCallback {
         }
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public PostgreSQLContainer<?> getDatabaseContainer() {
         return databaseContainer;
     }
 
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public GenericContainer<?> getAppContainer() {
         return appContainer;
     }

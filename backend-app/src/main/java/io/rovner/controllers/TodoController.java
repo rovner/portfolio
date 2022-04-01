@@ -49,6 +49,7 @@ public class TodoController {
 
     @DeleteMapping(value = "todo/{id}")
     public void deleteItem(@PathVariable Long id) {
+        repository.findById(id).orElseThrow(() -> new TodoItemNotFoundException(id));
         repository.deleteById(id);
     }
 }

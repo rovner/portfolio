@@ -84,13 +84,41 @@ build.finalizedBy jacocoTestCoverageVerification
 
 spotbugsMain {
     //noinspection GroovyAssignabilityCheck
-    reports {
+     reports {
         html {
             //noinspection GroovyAssignabilityCheck
             required = true
             //noinspection GroovyAssignabilityCheck
             outputLocation = file("$buildDir/reports/spotbugs/main/spotbugs.html")
             stylesheet = 'fancy-hist.xsl'
+        }
+    }
+}
+
+spotbugsTest {
+    //noinspection GroovyAssignabilityCheck
+    reports {
+        html {
+            //noinspection GroovyAssignabilityCheck
+            required = true
+            //noinspection GroovyAssignabilityCheck
+            outputLocation = file("$buildDir/reports/spotbugs/test/spotbugs.html")
+            stylesheet = 'fancy-hist.xsl'
+        }
+    }
+}
+
+afterEvaluate {
+    spotbugsIntegrationTest {
+        //noinspection GroovyAssignabilityCheck
+        reports {
+            html {
+                //noinspection GroovyAssignabilityCheck
+                required = true
+                //noinspection GroovyAssignabilityCheck
+                outputLocation = file("$buildDir/reports/spotbugs/integrationTest/spotbugs.html")
+                stylesheet = 'fancy-hist.xsl'
+            }
         }
     }
 }
@@ -126,7 +154,7 @@ tasks.register('integrationTest', Test) {
             "junit.jupiter.execution.parallel.mode.default": "concurrent",
             "junit.jupiter.execution.parallel.mode.classes.default": "concurrent",
             "junit.jupiter.execution.parallel.config.strategy": "fixed",
-            "junit.jupiter.execution.parallel.config.fixed.parallelism": "5"
+            "junit.jupiter.execution.parallel.config.fixed.parallelism": "3"
     ]
     //noinspection GrUnresolvedAccess
     dependsOn tasks.docker
