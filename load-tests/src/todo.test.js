@@ -31,7 +31,7 @@ export function setup() {
             headers: { 'Content-Type': 'application/json' },
         };
         const res = http.post(`http://${__ENV.HOSTNAME}/api/v1/todos/todo`, body, params);
-        data.push(JSON.stringify(res.body).id);
+        data.push(JSON.parse(res.body).id);
     }
     return data;
 }
