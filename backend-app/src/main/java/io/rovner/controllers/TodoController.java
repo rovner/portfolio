@@ -13,6 +13,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping("api/v1/todos")
 @Slf4j
+@CrossOrigin
 public class TodoController {
 
     @Autowired

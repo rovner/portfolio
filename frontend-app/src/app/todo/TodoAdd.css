@@ -1,0 +1,56 @@
+.todo-add-form {
+    margin: 10px;
+}
+
+.todo-add-disclaimer {
+    margin: 10px;
+    color: #3498db;
+}
+
+.todo-add-task {
+    display: block;
+    margin-bottom: 10px;
+    border: none;
+    width: calc(100vw - 40px);
+    min-height: 100px;
+    box-shadow: inset 0 0 0 1px #3498db;
+    resize: vertical;
+    padding: 10px;
+}
+
+.todo-add-task:focus {
+    outline: none !important;
+    border: none;
+    box-shadow: inset 0 0 0 2px #3498db;
+}
+
+.todo-add-task::-webkit-resizer {
+  display: none;
+}
+
+.todo-add-deadline {
+    margin-bottom: 10px;
+}
+
+.todo-add-deadline .react-datetime-picker__wrapper {
+    border: none;
+    box-shadow: inset 0 0 0 1px #3498db;
+}
+
+.todo-add-deadline .react-datetime-picker__inputGroup > * {
+    color: #2980b9;
+}
+
+.todo-add-deadline .react-datetime-picker__button > svg {
+    stroke: #2980b9;
+}
+
+.todo-add-submit {
+    background: #3498db;
+    display: block;
+    margin: 0;
+}
+
+.todo-add-submit:hover {
+	background: #2980b9;
+}
