@@ -1,6 +1,6 @@
 import React from "react";
 import DateTimePicker from 'react-datetime-picker';
-import './TodoAdd.css'
+import './TodoForm.css'
 
 class TodoItem extends React.Component {
     constructor(props) {
@@ -39,11 +39,14 @@ class TodoItem extends React.Component {
                  'Content-Type': 'application/json'
              },
          })
-            .then(() => {
-                alert('Todo was submitted');
-                this.props.handleChange();
-            })
-            .catch(err => alert(err.toString()));
+            .then(response => {
+                if (response.ok) {
+                    alert('Todo was submitted');
+                    this.props.handleChange();
+                } else {
+                    alert(response.statusText);
+                }
+            });
     }
 
     render() {

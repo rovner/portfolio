@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import TodoList from './todo/TodoList'
-import TodoAdd from './todo/TodoAdd'
+import TodoForm from './todo/TodoForm'
 
 class App extends React.Component {
 
@@ -22,7 +22,7 @@ class App extends React.Component {
     render() {
         return <div className="app">
                 <TodoList key={this.state.key}/>
-                <TodoAdd handleChange={this.handleChange}/>
+                <TodoForm handleChange={this.handleChange}/>
             </div>;
     }
 }

@@ -15,8 +15,13 @@ class TodoItem extends React.Component {
                     'Content-Type': 'application/json'
                 },
             })
-            .then(() => this.props.handleChange())
-            .catch(err => alert(err.toString()));
+            .then(response => {
+                if (response.ok) {
+                    this.props.handleChange();
+                } else {
+                     alert(response.statusText);
+                }
+            });
     }
 
     render() {

@@ -18,12 +18,21 @@ class TodoList extends React.Component {
                  'Content-Type': 'application/json'
                },
             })
-            .then(response => response.json())
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error(response.statusText);
+                }
+            })
             .then(data => this.setState({
                 items: data,
                 loaded: true
-             }))
-             .catch(err => this.setState({ error: err.toString() }));
+            }))
+            .catch(err => this.setState({
+                error: err.message,
+                loaded: true
+            }));
     }
 
     componentDidMount() {
@@ -35,7 +44,7 @@ class TodoList extends React.Component {
             return <div className="loading-indicator">Loading...</div>;
         }
         if (this.state.error) {
-            return <div className="error-message">${this.state.error}</div>;
+            return <div className="error-message">{this.state.error}</div>;
         }
         if (this.state.items.length === 0) {
             return <div className="empty-todo-list">Nothing todo</div>

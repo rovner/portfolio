@@ -1,4 +1,4 @@
-#### Backend example app
+### Backend example app
 - Example of spring boot app with Rest API
 - Spring boot unit tests
 - Rest API tests based on retrofit and test containers
