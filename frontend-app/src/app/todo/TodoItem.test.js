@@ -18,7 +18,7 @@ test('renders overdue todo', () => {
         deadline: 1649682543889,
         task: "TEST TASK"
     }
-    const { container } = render(<TodoItem item={item}/>);
+    const {container} = render(<TodoItem item={item}/>);
     expect(container.getElementsByClassName('todo-item').length).toBe(1);
     expect(container.getElementsByClassName('overdue').length).toBe(1);
     expect(container.getElementsByClassName('todo-item-deadline').length).toBe(1);
@@ -32,7 +32,7 @@ test('renders not overdue todo', () => {
         deadline: 1659682543889,
         task: "TEST TASK"
     }
-    const { container } = render(<TodoItem item={item}/>);
+    const {container} = render(<TodoItem item={item}/>);
     expect(container.getElementsByClassName('todo-item').length).toBe(1);
     expect(container.getElementsByClassName('overdue').length).toBe(0);
     expect(container.getElementsByClassName('todo-item-deadline').length).toBe(1);
@@ -52,7 +52,7 @@ test('delete todo', async () => {
         deadline: 1649682543889,
         task: "TEST TASK"
     }
-    const { container } = render(<TodoItem item={item} handleChange={mockHandle}/>);
+    render(<TodoItem item={item} handleChange={mockHandle}/>);
     fireEvent.click(screen.getByText('Delete'));
     await waitFor(() => expect(deleted).toBe(true));
     expect(mockHandle.mock.calls.length).toBe(1);
@@ -70,7 +70,7 @@ test('error deleting todo', async () => {
         deadline: 1649682543889,
         task: "TEST TASK"
     }
-    const { container } = render(<TodoItem item={item} handleChange={mockHandle}/>);
+    render(<TodoItem item={item} handleChange={mockHandle}/>);
     fireEvent.click(screen.getByText('Delete'));
     await waitFor(() => expect(window.alert.mock.calls.length).toBe(1));
     expect(mockHandle.mock.calls.length).toBe(0);

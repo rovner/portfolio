@@ -30,15 +30,15 @@ class TodoItem extends React.Component {
             return;
         }
         fetch(`${process.env.REACT_APP_SERVER_URL}/api/v1/todos/todo`, {
-             method: 'POST',
-             body: JSON.stringify({
-                 task: this.state.task,
-                 deadline: this.state.deadline.getTime(),
-             }),
-             headers: {
-                 'Content-Type': 'application/json'
-             },
-         })
+            method: 'POST',
+            body: JSON.stringify({
+                task: this.state.task,
+                deadline: this.state.deadline.getTime(),
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
             .then(response => {
                 if (response.ok) {
                     alert('Todo was submitted');
@@ -51,13 +51,14 @@ class TodoItem extends React.Component {
 
     render() {
         return <div>
-                <div className="todo-add-disclaimer">New Task:</div>
-                <form className="todo-add-form" onSubmit={this.handleSubmit}>
-                    <DateTimePicker className="todo-add-deadline" onChange={this.handleDeadlineChange} value={this.state.deadline} />
-                    <textarea className="todo-add-task" value={this.state.value} onChange={this.handleTaskChange} />
-                    <input className="button todo-add-submit" type="submit" value="Submit" />
-                </form>
-            </div>;
+            <div className="todo-add-disclaimer">New Task:</div>
+            <form className="todo-add-form" onSubmit={this.handleSubmit}>
+                <DateTimePicker className="todo-add-deadline" onChange={this.handleDeadlineChange}
+                                value={this.state.deadline}/>
+                <textarea className="todo-add-task" value={this.state.value} onChange={this.handleTaskChange}/>
+                <input className="button todo-add-submit" type="submit" value="Submit"/>
+            </form>
+        </div>;
     }
 }
 

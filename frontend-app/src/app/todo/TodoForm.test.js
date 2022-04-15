@@ -14,7 +14,7 @@ afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 test('renders todo form', async () => {
-    const { container } = render(<TodoForm handleChange={jest.fn}/>);
+    const {container} = render(<TodoForm handleChange={jest.fn}/>);
     expect(container.getElementsByClassName('todo-add-disclaimer').length).toBe(1);
     expect(container.getElementsByClassName('todo-add-deadline').length).toBe(1);
     expect(container.getElementsByClassName('todo-add-task').length).toBe(1);
@@ -30,23 +30,23 @@ test('submit new todo', async () => {
         }),
     );
 
-    const { container } = render(<TodoForm handleChange={jest.fn}/>);
+    const {container} = render(<TodoForm handleChange={jest.fn}/>);
 
-    fireEvent.change(container.getElementsByClassName('react-datetime-picker__inputGroup__day')[0], {target: {value: '1'}})
-    fireEvent.change(container.getElementsByClassName('react-datetime-picker__inputGroup__month')[0], {target: {value: '1'}})
+    fireEvent.change(container.getElementsByClassName('react-datetime-picker__inputGroup__day')[0], {target: {value: '01'}})
+    fireEvent.change(container.getElementsByClassName('react-datetime-picker__inputGroup__month')[0], {target: {value: '01'}})
     fireEvent.change(container.getElementsByClassName('react-datetime-picker__inputGroup__year')[0], {target: {value: '2040'}})
-    fireEvent.change(container.getElementsByClassName('react-datetime-picker__inputGroup__hour')[0], {target: {value: '0'}})
+    fireEvent.change(container.getElementsByClassName('react-datetime-picker__inputGroup__hour')[0], {target: {value: '12'}})
     fireEvent.change(container.getElementsByClassName('react-datetime-picker__inputGroup__minute')[0], {target: {value: '00'}})
     fireEvent.change(container.getElementsByClassName('todo-add-task')[0], {target: {value: 'test task'}})
     fireEvent.click(screen.getByText('Submit'));
 
     await waitFor(() => expect(window.alert.mock.calls.length).toBe(1));
     expect(body.task).toBe('test task');
-    expect(body.deadline).toBe(2208978000000);
+    expect(body.deadline).toBe(2209021200000);
 });
 
 test('submit new todo without task', async () => {
-    const { container } = render(<TodoForm handleChange={jest.fn}/>);
+    render(<TodoForm handleChange={jest.fn}/>);
     fireEvent.click(screen.getByText('Submit'));
     expect(window.alert.mock.calls.length).toBe(1);
     expect(window.alert.mock.lastCall[0]).toBe('Please fill todo task!');
@@ -59,7 +59,7 @@ test('submit error', async () => {
         }),
     );
 
-    const { container } = render(<TodoForm handleChange={jest.fn}/>);
+    const {container} = render(<TodoForm handleChange={jest.fn}/>);
 
     fireEvent.change(container.getElementsByClassName('todo-add-task')[0], {target: {value: 'test task'}})
     fireEvent.click(screen.getByText('Submit'));

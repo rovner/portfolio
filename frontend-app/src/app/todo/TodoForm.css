@@ -25,7 +25,7 @@
 }
 
 .todo-add-task::-webkit-resizer {
-  display: none;
+    display: none;
 }
 
 .todo-add-deadline {
@@ -52,5 +52,5 @@
 }
 
 .todo-add-submit:hover {
-	background: #2980b9;
+    background: #2980b9;
 }

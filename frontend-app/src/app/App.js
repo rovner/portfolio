@@ -21,9 +21,9 @@ class App extends React.Component {
 
     render() {
         return <div className="app">
-                <TodoList key={this.state.key}/>
-                <TodoForm handleChange={this.handleChange}/>
-            </div>;
+            <TodoList key={this.state.key}/>
+            <TodoForm handleChange={this.handleChange}/>
+        </div>;
     }
 }
 

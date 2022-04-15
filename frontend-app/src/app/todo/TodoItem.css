@@ -18,11 +18,11 @@
 }
 
 .todo-item-deadline {
-   display: inline-block;
-   margin: 10px;
-   width: 200px;
-   text-align: right;
-   vertical-align: top;
+    display: inline-block;
+    margin: 10px;
+    width: 200px;
+    text-align: right;
+    vertical-align: top;
 }
 
 .todo-item-task {
@@ -30,7 +30,7 @@
     margin: 10px;
     width: calc(100vw - 400px);
     vertical-align: top;
-    white-space: pre;
+    white-space: pre-line;
 }
 
 .todo-item-delete {

@@ -1,5 +1,6 @@
 import React from 'react';
 import TodoItem from './TodoItem'
+import './TodoList.css'
 
 class TodoList extends React.Component {
     constructor(props) {
@@ -14,10 +15,10 @@ class TodoList extends React.Component {
 
     handleChange() {
         fetch(`${process.env.REACT_APP_SERVER_URL}/api/v1/todos`, {
-               headers: {
-                 'Content-Type': 'application/json'
-               },
-            })
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
             .then(response => {
                 if (response.ok) {
                     return response.json();
@@ -47,7 +48,7 @@ class TodoList extends React.Component {
             return <div className="error-message">{this.state.error}</div>;
         }
         if (this.state.items.length === 0) {
-            return <div className="empty-todo-list">Nothing todo</div>
+            return <div className="empty-todo-list">No todos</div>
         }
         const items = this.state.items.map(item =>
             <TodoItem key={item.id} item={item} handleChange={this.handleChange}/>);

@@ -16,9 +16,9 @@ afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 test('renders empty todos', async () => {
-    const { container } = render(<TodoList/>);
+    render(<TodoList/>);
     expect(screen.getByText('Loading...')).toBeInTheDocument();
-    await waitFor(() => screen.getByText('Nothing todo'));
+    await waitFor(() => screen.getByText('No todos'));
 });
 
 test('renders 2 todos', async () => {
@@ -30,7 +30,7 @@ test('renders 2 todos', async () => {
             ]));
         }),
     )
-    const { container } = render(<TodoList/>);
+    render(<TodoList/>);
     await waitFor(() => screen.getByText('test 1'));
     await waitFor(() => screen.getByText('test 2'));
 });
@@ -41,7 +41,7 @@ test('renders error', async () => {
             return res(ctx.status(500));
         }),
     )
-    const { container } = render(<TodoList/>);
+    render(<TodoList/>);
     await waitFor(() => screen.getByText('Internal Server Error'));
 });
 
@@ -53,19 +53,19 @@ test('refresh todo list when todo is deleted', async () => {
             ]));
         }),
     )
-    const { container } = render(<TodoList/>);
+    render(<TodoList/>);
     await waitFor(() => screen.getByText('test 1'));
     let isDeletedOnServer = false;
     server.use(
         rest.get(todosUrl, (req, res, ctx) => {
             return res(ctx.json([]));
         }),
-        rest.delete(`${todosUrl}/todo/1`, (req, res, ctx) => {
+        rest.delete(`${todosUrl}/todo/1`, (req, res) => {
             isDeletedOnServer = true;
             return res();
         }),
     )
     fireEvent.click(screen.getByText('Delete'));
-    await waitFor(() => screen.getByText('Nothing todo'));
+    await waitFor(() => screen.getByText('No todos'));
     expect(isDeletedOnServer).toBe(true);
 });

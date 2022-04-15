@@ -7,6 +7,6 @@
 `npm start`
 
 ##### To run unit tests
-`npm test`
+`npm test .`
 
 Coverage report will be available at `coverage/lcov-report/index.html`

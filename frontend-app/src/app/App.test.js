@@ -18,13 +18,13 @@ afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 test('renders todo form', async () => {
-    const { container } = render(<App/>);
+    const {container} = render(<App/>);
     await waitFor(() => expect(container.getElementsByClassName('empty-todo-list').length).toBe(1));
     expect(container.getElementsByClassName('todo-add-form').length).toBe(1);
 });
 
 test('refresh list when new todo added', async () => {
-    const { container } = render(<App/>);
+    const {container} = render(<App/>);
     let body;
     server.use(
         rest.post(`${todosUrl}/todo`, (req, res, ctx) => {
