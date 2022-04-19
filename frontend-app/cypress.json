@@ -1,10 +1,16 @@
 {
   "baseUrl": "http://127.0.0.1:3000",
+  "viewportWidth": 1920,
+  "viewportHeight": 1080,
   "env": {
     "apiUrl": "http://localhost:8080",
     "cypress-plugin-snapshots": {
       "imageConfig": {
-        "threshold": 0
+        "threshold": 0,
+        "screenshotConfig": {
+          "capture": "viewport",
+          "scale": false
+        }
       }
     }
   },

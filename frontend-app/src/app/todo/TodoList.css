@@ -2,3 +2,9 @@
     margin: 10px;
     color: #3498db;
 }
+
+.error-message {
+    margin: 10px;
+    font-weight: bold;
+    color: #c0392b;
+}

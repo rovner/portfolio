@@ -26,7 +26,7 @@ class TodoItem extends React.Component {
 
     render() {
         const isOverdue = Date.now() > this.props.item.deadline;
-        return <div className={"todo-item " + (isOverdue ? 'overdue' : '')}>
+        return <div className={"todo-item-wrapper " + (isOverdue ? 'overdue' : '')}>
             <div className="todo-item-deadline">{new Date(this.props.item.deadline).toLocaleString()}</div>
             <div className="todo-item-task">{this.props.item.task}</div>
             <button className="todo-item-delete button" onClick={() => this.handleDelete(this.props.item.id)}>Delete
