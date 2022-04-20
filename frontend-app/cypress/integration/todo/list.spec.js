@@ -9,7 +9,7 @@ describe('Todo list', () => {
     })
 
     it('Empty list of todos', () => {
-        cy.intercept(api.list.type, api.list.url, [])
+        cy.intercept(api.list.type, api.list.url, []);
         homePage.open();
         homePage.emptyList().toMatchImageSnapshot();
     })
