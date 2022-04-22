@@ -14,7 +14,7 @@ class TodoList extends React.Component {
     }
 
     handleChange() {
-        fetch(`${process.env.REACT_APP_SERVER_URL}/api/v1/todos`, {
+        fetch(`${window._env_.BACKEND_API_URL}/api/v1/todos`, {
             headers: {
                 'Content-Type': 'application/json'
             },

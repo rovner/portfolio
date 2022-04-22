@@ -29,7 +29,7 @@ class TodoItem extends React.Component {
             alert("Please fill todo task!");
             return;
         }
-        fetch(`${process.env.REACT_APP_SERVER_URL}/api/v1/todos/todo`, {
+        fetch(`${window._env_.BACKEND_API_URL}/api/v1/todos/todo`, {
             method: 'POST',
             body: JSON.stringify({
                 task: this.state.task,

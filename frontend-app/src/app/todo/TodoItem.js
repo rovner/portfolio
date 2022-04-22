@@ -9,7 +9,7 @@ class TodoItem extends React.Component {
     }
 
     handleDelete(id) {
-        fetch(`${process.env.REACT_APP_SERVER_URL}/api/v1/todos/todo/${id}`, {
+        fetch(`${window._env_.BACKEND_API_URL}/api/v1/todos/todo/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'

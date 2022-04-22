@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.8'
 services:
   db:
     image: postgres:12.10
@@ -9,7 +9,19 @@ services:
       - ./build/db/:/var/lib/postgresql/data
   backend:
     image: backend-app
+    build:
+      context: backend-app
+      target: prod
     volumes:
       - ./configs/backend.config.yaml:/etc/app/application.yaml
     ports:
-      - 8080:8080
+      - "8080:8080"
+  frontend:
+    image: frontend-app
+    ports:
+      - "80:80"
+    volumes:
+      - ./configs/frontend.config.js:/usr/share/nginx/html/config.js
+    build:
+      context: frontend-app
+      target: prod

@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:12.10
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+    volumes:
+      - ./build/db/:/var/lib/postgresql/data
+      - ${HOME}/.gradle/caches:/root/.gradle/caches
+  backend:
+    build:
+      context: backend-app
+      target: dev
+    image: backend-app
+    volumes:
+      - ./backend-app:/app
+    ports:
+      - "8080:8080"
+      - "35729:35729"
+      - "5005:5005"
+  frontend:
+    image: frontend-app-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend-app/src:/app/src
+      - ./frontend-app/public:/app/public
+      - ./configs/frontend.config.js:/usr/share/nginx/html/config.js
+    build:
+      context: frontend-app
+      target: dev

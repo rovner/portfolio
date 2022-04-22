@@ -22,7 +22,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --coverage",
-    "cypress": "cypress open"
+    "cypress": "cypress open",
+    "docker": "docker build -t frontend-app ."
   },
   "eslintConfig": {
     "extends": [

@@ -4,7 +4,6 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'io.freefair.lombok' version '6.4.1'
     id 'jacoco'
-    id 'com.palantir.docker' version '0.26.0'
     id 'com.github.spotbugs' version '5.0.6'
     id 'io.qameta.allure' version '2.9.6'
 }
@@ -35,6 +34,8 @@ dependencies {
     implementation('org.postgresql:postgresql:42.3.3')
 
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
@@ -144,13 +145,19 @@ afterEvaluate {
     }
 }
 
-docker {
-    dependsOn bootJar
-    name "backend-app"
-    files bootJar.outputs
-    buildArgs([
-            JAR_FILE: "${project.name}-${version}.jar"
-    ])
+bootJar {
+    archiveFileName = "backend-app.jar"
+}
+
+bootRun {
+    jvmArgs = [
+            "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005",
+            "-Djava.security.egd=file:/dev/./urandom",
+            "-Xmx1G",
+            "-XX:ActiveProcessorCount=1",
+            "-XX:+UseContainerSupport",
+            "-XX:+AlwaysActAsServerClassMachine"
+    ]
 }
 
 sourceSets {
@@ -158,6 +165,12 @@ sourceSets {
         compileClasspath += sourceSets.main.output
         runtimeClasspath += sourceSets.main.output
     }
+}
+
+tasks.register('docker', Exec) {
+    description = 'Build docker image.'
+    group = 'build'
+    commandLine 'docker', 'build', '-t', 'backend', '--target', 'prod', '.'
 }
 
 tasks.register('integrationTest', Test) {
